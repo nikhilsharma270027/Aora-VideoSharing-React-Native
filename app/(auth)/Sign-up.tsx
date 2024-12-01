@@ -7,9 +7,10 @@ import Formfield from "@/components/Formfield";
 import CustomButton from "@/components/CustomButton";
 import { Link, router } from "expo-router";
 import { createUser } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const SignUp = () => {
-  const [isLoading, setLoading] = useState(false);
+  const { setUser, setIsLogged } = useGlobalContext();
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     username: "",
@@ -27,8 +28,10 @@ const SignUp = () => {
     try {
       
       const result = await createUser(form.email, form.password, form.username);
-      // setUser(result);
-      // setIsLogged(true);
+      Alert.alert(result.data);
+      console.log(result);
+      setUser(result.data);
+      setIsLogged(true);
 
       router.replace("/Home");
     } catch (error: any) {
@@ -71,7 +74,7 @@ const SignUp = () => {
             otherStyles="mt-7"
           />
           <CustomButton
-            title={"Sign In"}
+            title={"Sign Up"}
             handlePress={submit}
             containerStyles={"mt-7"}
             isLoading={isSubmitting}
@@ -84,7 +87,7 @@ const SignUp = () => {
             <Link
               href="/Sign-in"
               className="text-lg font-psemibold text-secondary">
-              Sign in
+              Sign In
             </Link>
           </View>
         </View>

@@ -10,7 +10,7 @@ interface GlobalContextType {
   loading: boolean;
 }
 
-// Create the context
+// Create the context 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 // Create a custom hook for consuming the context

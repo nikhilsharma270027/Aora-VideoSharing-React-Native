@@ -6,10 +6,11 @@ import { images } from "@/constants";
 import Formfield from "@/components/Formfield";
 import CustomButton from "@/components/CustomButton";
 import { Link, router } from "expo-router";
-import { signIn } from "@/lib/appwrite";
+import { getCurrentUser, signIn } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const SignIn = () => {
-  const [isLoading, setLoading] = useState(false);
+  const { setUser, setIsLogged } = useGlobalContext();
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     email: "",
@@ -26,8 +27,10 @@ const SignIn = () => {
     try {
       
       await signIn(form.email, form.password);
-      // setUser(result);
-      // setIsLogged(true);
+      const result = await getCurrentUser();
+      console.log(result)
+      setUser(result);
+      setIsLogged(true);
 
       router.replace("/Home");
     } catch (error: any) {

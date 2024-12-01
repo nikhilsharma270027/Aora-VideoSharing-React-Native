@@ -5,7 +5,7 @@ export const appwriteConfig = {
     Platform: 'com.nikhil.aora',
     projectId: '674ac52e0014f4c52044',
     databaseId: '674ac77d0032bb0cf24b',
-    userCollectionId: '674ac7a0002b50ec51f4',
+    userCollectionId: '674c5ffc002512726d00',
     videoCollectionId: '674ac7cc001c303a8a85',
     storageId: '674ac9ab0009e5925d4b',
 }
@@ -96,12 +96,25 @@ export async function getCurrentUser() {
   
       if (!currentUser) throw Error;
   
-      return currentUser.documents[0];
+      return currentUser.documents[0]; // bcuz we need only one users
     } catch (error: any) {
       console.log(error);
       return null;
     }
   }
+
+
+export const getAllPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId
+    )
+    return posts;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
 
 // // Register User
 // account.create(ID.unique(), 'me@example.com', 'password', 'Jane Doe')
