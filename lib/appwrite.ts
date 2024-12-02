@@ -116,10 +116,26 @@ export const getAllPosts = async () => {
   }
 }
 
+export const getTrendingPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId,
+      [
+        Query.orderDesc('$createdAt'), // Sort by creation date in descending order
+        Query.limit(7), // Limit the results to 7 documents
+      ]
+    )
+    return posts;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
 // // Register User
 // account.create(ID.unique(), 'me@example.com', 'password', 'Jane Doe')
 //     .then(function (response) {
 //         console.log(response);
 //     }, function (error) {
-//         console.log(error);
+//         (error);
 //     });

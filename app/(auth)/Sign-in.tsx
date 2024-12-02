@@ -28,7 +28,7 @@ const SignIn = () => {
       
       await signIn(form.email, form.password);
       const result = await getCurrentUser();
-      console.log(result)
+      // console.log(result)
       setUser(result);
       setIsLogged(true);
 

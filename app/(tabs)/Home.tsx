@@ -5,13 +5,14 @@ import { images } from '@/constants'
 import SearchInput from '@/components/SearchInput'
 import Trending from '@/components/Trending'
 import EmptyState from '@/components/EmptyState'
-import { getAllPosts } from '@/lib/appwrite'
+import { getAllPosts, getTrendingPosts } from '@/lib/appwrite'
 import { Models } from 'react-native-appwrite/types/models'
 import useAppwrite from '@/lib/useAppwrite'
 import VideoCard from '@/components/VideoCard'
 const Home = () => {
   // Custom hook to fetch data from db
   const { data: posts, refetch, isLoading} = useAppwrite(getAllPosts);
+  const { data: latestPosts} = useAppwrite(getTrendingPosts);
 
   
   const [refreshing, setRefreshing] = useState(false);
@@ -23,7 +24,7 @@ const Home = () => {
     setRefreshing(false)
   }
 
-  console.log(posts)
+  // console.log(posts)
 
   return (
    <SafeAreaView className='bg-primary h-full'>
@@ -36,9 +37,13 @@ const Home = () => {
       keyExtractor={(item): any => item.$id}
       //his explains react native how we want to render each item in the list 
       // we can destruct from eaxh item
-      renderItem={({item})=> (
-        <VideoCard 
-          video={item}
+      renderItem={({ item }) => (
+        <VideoCard
+          title={item.title}
+          thumbnail={item.thumbnail}
+          video={item.video}
+          creator={item.creator.username}
+          avatar={item.creator.avatar}
         />
       )}
       //ListHeaderComponent: It is rendered at the top of all the items.
@@ -47,11 +52,11 @@ const Home = () => {
 
           <View className='justify-between items-start flex-row m-6'>
             <View className=''>
-              <Text className='font-pmedium text-sm text bg-gray-100'>
+              <Text className='font-pmedium text-sm text text-gray-100'>
                   Welcome back
               </Text>
               <Text className='text-2xl font-psemibold text-white'>
-                Video app
+                Aora app
               </Text>
             </View>
             <View className='mt-1.5'>
@@ -71,7 +76,7 @@ const Home = () => {
             </Text>
           </View>
 
-          <Trending posts={[{id:1}, {id: 2}] }/>
+          <Trending posts={latestPosts?.documents || []}/>
         </View>
       )}
       ListEmptyComponent={() => (

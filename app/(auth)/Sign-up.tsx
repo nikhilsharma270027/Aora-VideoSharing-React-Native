@@ -29,7 +29,7 @@ const SignUp = () => {
       
       const result = await createUser(form.email, form.password, form.username);
       Alert.alert(result.data);
-      console.log(result);
+      // console.log(result);
       setUser(result.data);
       setIsLogged(true);
 
