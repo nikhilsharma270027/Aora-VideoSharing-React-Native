@@ -24,7 +24,7 @@ const Home = () => {
     setRefreshing(false)
   }
 
-  // console.log(posts)
+  // console.log(latestPosts?.documents)
 
   return (
    <SafeAreaView className='bg-primary h-full'>
