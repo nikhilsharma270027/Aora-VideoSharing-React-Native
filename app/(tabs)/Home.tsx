@@ -6,10 +6,12 @@ import SearchInput from '@/components/SearchInput'
 import Trending from '@/components/Trending'
 import EmptyState from '@/components/EmptyState'
 import { getAllPosts, getTrendingPosts } from '@/lib/appwrite'
-import { Models } from 'react-native-appwrite/types/models'
 import useAppwrite from '@/lib/useAppwrite'
 import VideoCard from '@/components/VideoCard'
+import { useGlobalContext } from '@/context/GlobalProvider'
+
 const Home = () => {
+  const { user, setUser, setIsLogged } = useGlobalContext();
   // Custom hook to fetch data from db
   const { data: posts, refetch, isLoading} = useAppwrite(getAllPosts);
   const { data: latestPosts} = useAppwrite(getTrendingPosts);
@@ -56,7 +58,7 @@ const Home = () => {
                   Welcome back
               </Text>
               <Text className='text-2xl font-psemibold text-white'>
-                Aora app
+                {user?.username}
               </Text>
             </View>
             <View className='mt-1.5'>
@@ -74,9 +76,10 @@ const Home = () => {
             <Text className='text-gray-100 text-lg font-pregular mg-3'>
               Latest Videos
             </Text>
+            
+            <Trending posts={latestPosts?.documents || []}/>
           </View>
 
-          <Trending posts={latestPosts?.documents || []}/>
         </View>
       )}
       ListEmptyComponent={() => (

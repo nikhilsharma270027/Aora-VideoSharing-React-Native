@@ -38,6 +38,7 @@ const GlobalProvider = ({ children }: Props) => {
         if (res) {
           setIsLogged(true);
           setUser(res);
+          // console.log('userdata',res)
         } else {
           setIsLogged(false);
           setUser(null);

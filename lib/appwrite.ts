@@ -11,7 +11,7 @@ export const appwriteConfig = {
 }
 
 // init your react-native SDK
-import { Client, Account, ID, Avatars, Databases, Query } from 'react-native-appwrite';
+import { Client, Account, ID, Avatars, Databases, Query, Storage } from 'react-native-appwrite';
 
 const client = new Client()
 client
@@ -21,9 +21,9 @@ client
 
 
 const account = new Account(client);
-// const storage = new Storage(client);
 const avatars = new Avatars(client)
 const databases = new Databases(client)
+const storage = new Storage(client);
 
 export const createUser = async (email: string, password: string, username: string,) => {
 
@@ -131,6 +131,152 @@ export const getTrendingPosts = async () => {
     throw new Error(error);
   }
 }
+
+export const searchPosts = async (query: string) => {
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId,
+      [
+        Query.search("title", query), // Search by "title" field
+        Query.limit(7),              // Limit results to 7
+        Query.orderDesc("$createdAt") // Sort by creation date in descending order
+      ]
+    );
+    return posts;
+  } catch (error: any) {
+    console.error("Error fetching posts:", error.message);
+    throw new Error("Failed to fetch posts. Please try again.");
+  }
+};
+
+export const getUserPosts = async (userId : string) => {
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId,
+      [
+        Query.equal('creator', userId), // Sort by creation date in descending order
+        
+      ]
+    )
+    return posts;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function signOut() {
+  try {
+    const session = await account.deleteSession('current');
+
+    return session;
+  } catch (error: any) {
+    throw new Error("Error during signOut",error);
+  }
+}
+
+export const getFilePreview = (fileId: string, type: string) => {
+  let fileUrl;
+
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(appwriteConfig.storageId, fileId);
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        appwriteConfig.storageId,
+        fileId,
+        2000,//width
+        2000,//height
+        "top",//gravity
+        100
+      ) 
+    } else {
+        throw new Error("Invalid file type");
+      }
+
+      if(!fileUrl) throw Error;
+      console.log(fileUrl)
+     return fileUrl; 
+  } catch (error:any) {
+    throw new Error(error);
+  }
+
+} 
+
+export const uploadFile = async (file: any, type: string) => {
+  if (!file) return;
+
+  const asset = {
+    name: file.fileName,
+    type: file.mimeType,
+    uri: file.uri,
+  };
+
+  try {
+    // Upload the file
+    const uploadedFile = await storage.createFile(
+      appwriteConfig.storageId,
+      ID.unique(),
+      asset
+    );
+
+    // Generate the file preview URL
+    const fileUrl =
+      type === "image"
+        ? storage.getFilePreview(
+            appwriteConfig.storageId,
+            "dkjfnkjfkdfdkkfk",
+            2000, // Width
+            2000, // Height
+            "top", // Gravity
+            100 // Quality
+          )
+        : storage.getFileView(appwriteConfig.storageId, "sdkjfkdjfkd");
+
+    if (!fileUrl) throw new Error("Failed to generate file URL");
+
+    console.log(`File uploaded successfully: ${fileUrl}`);
+    return { url: fileUrl };
+  } catch (error: any) {
+    console.error("Error uploading file:", error.message);
+    throw new Error(error.message);
+  }
+};
+
+
+export async function createVideoPost(form: any) {
+  try {
+    // Upload thumbnail and video files concurrently
+    const [thumbnail, video] = await Promise.all([
+      uploadFile(form.thumbnail, "image"),
+      uploadFile(form.video, "video"),
+    ]);
+
+    // Create the new video post in the database
+    const newPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        thumbnail: thumbnail.url,
+        video: video.url,
+        prompt: form.prompt,
+        creator: form.userId,
+      }
+    );
+
+    console.log("Video post created successfully:", newPost);
+    return newPost;
+  } catch (error: any) {
+    console.error("Error creating video post:", error.message);
+    throw new Error(error.message);
+  }
+}
+
+
+
 
 // // Register User
 // account.create(ID.unique(), 'me@example.com', 'password', 'Jane Doe')

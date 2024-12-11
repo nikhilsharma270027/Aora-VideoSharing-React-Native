@@ -15,5 +15,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-, "app/Profile.jsx", "app/index.jsx", "app/_layout.jsx", "context/GlobalProvider.js"  ]
+, "app/Profile.jsx", "app/index.jsx", "app/_layout.jsx", "context/GlobalProvider.js", "app/(tabs)/Profile.jsx"  ]
 }
